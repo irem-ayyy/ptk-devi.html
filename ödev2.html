@@ -1,0 +1,152 @@
+**** HTML Kısmı ****
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Gates'in Bakiyesi</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Bill Gates'in Bakiyesi: $<span id="balance">100,000,000,000</span></h1>
+    <div id="productList">
+        <!-- Ürünler burada listelenecek -->
+    </div>
+    <div id="transactions">
+        <h2>Satın Alınan Ürünler</h2>
+        <ul id="transactionList">
+            <!-- Satın alınan ürünler burada listelenecek -->
+        </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+**** CSS Kısmı ****
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+h1 {
+    background-color: #0074cc;
+    color: white;
+    padding: 10px;
+}
+
+#productList {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+}
+
+button {
+    background-color: #0074cc;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#transactions {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    margin-bottom: 10px;
+}
+
+**** JS Kısmı ****
+// Ürünler ve bakiye tanımı
+const products = [
+    { name: "Hayali Ürün 1", price: 100000000 },
+    { name: "Hayali Ürün 2", price: 50000000 },
+    { name: "Hayali Ürün 3", price: 25000000 },
+];
+
+let balance = 100000000000;
+const balanceElement = document.getElementById("balance");
+
+// Ürün listesini görüntüleme işlevi
+function displayProducts() {
+    const productList = document.getElementById("productList");
+    productList.innerHTML = "";
+
+    products.forEach((product, index) => {
+        const productElement = document.createElement("div");
+        productElement.className = "product";
+        productElement.innerHTML = `
+            <h3>${product.name}</h3>
+            <p>Fiyat: $${product.price}</p>
+            <button onclick="buyProduct(${index})" ${
+                product.price > balance ? "disabled" : ""
+            }>Satın Al</button>
+            <button onclick="sellProduct(${index})" ${
+                product.count > 0 ? "" : "disabled"
+            }>Sat</button>
+        `;
+        productList.appendChild(productElement);
+    });
+}
+
+// Satın alma işlevi
+function buyProduct(index) {
+    const product = products[index];
+    if (product.price <= balance) {
+        balance -= product.price;
+        displayBalance();
+        addTransaction(`Satın Alındı: ${product.name}`, product.price);
+        product.count = (product.count || 0) + 1;
+        displayProducts();
+    }
+}
+
+// Satma işlevi
+function sellProduct(index) {
+    const product = products[index];
+    if (product.count > 0) {
+        balance += product.price;
+        displayBalance();
+        addTransaction(`Satıldı: ${product.name}`, product.price);
+        product.count -= 1;
+        displayProducts();
+    }
+}
+
+// Bakiye görüntüleme işlevi
+function displayBalance() {
+    balanceElement.textContent = balance.toLocaleString();
+}
+
+// İşlem ekleme işlevi
+function addTransaction(description, amount) {
+    const transactionList = document.getElementById("transactionList");
+    const transactionItem = document.createElement("li");
+    transactionItem.textContent = `${description} - $${amount}`;
+    transactionList.appendChild(transactionItem);
+}
+
+// Başlangıçta ürünleri ve bakiyeyi görüntüle
+displayProducts();
+displayBalance();
