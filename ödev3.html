@@ -1,0 +1,113 @@
+// src/components/Card.js
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { flipCard } from "../actions";
+
+const Card = ({ card }) => {
+  const dispatch = useDispatch();
+  const flippedCards = useSelector((state) => state.flippedCards);
+
+  const handleClick = () => {
+    if (flippedCards.length < 2 && !flippedCards.includes(card.id)) {
+      dispatch(flipCard(card.id));
+    }
+  };
+
+  return (
+    <div
+      className={`card ${flippedCards.includes(card.id) ? "flipped" : ""}`}
+      onClick={handleClick}
+    >
+      {flippedCards.includes(card.id) ? card.value : ""}
+    </div>
+  );
+};
+
+export default Card;
+**************************************
+
+// src/components/Board.js
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { resetGame } from "../actions";
+import Card from "./Card";
+
+const Board = () => {
+  const dispatch = useDispatch();
+  const cards = useSelector((state) => state.cards);
+  const score = useSelector((state) => state.score);
+
+  const handleResetGame = () => {
+    dispatch(resetGame());
+  };
+
+  return (
+    <div className="board">
+      <div className="score">Puan: {score}</div>
+      <div className="cards">
+        {cards.map((card) => (
+          <Card key={card.id} card={card} />
+        ))}
+      </div>
+      <button onClick={handleResetGame}>Yeniden Oyna</button>
+    </div>
+  );
+};
+
+export default Board;
+**********************************
+// src/actions/index.js
+export const flipCard = (cardId) => ({
+  type: "FLIP_CARD",
+  payload: cardId,
+});
+
+export const resetGame = () => ({
+  type: "RESET_GAME",
+});
+********************************
+// src/reducers/index.js
+const initialState = {
+  cards: [...], // Kartları burada oluşturun (rastgele eşleşen çiftlerle)
+  flippedCards: [],
+  score: 0,
+};
+
+const rootReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case "FLIP_CARD":
+      // Kartı açma/kapama işlemleri burada yapılacak
+      return state;
+    case "RESET_GAME":
+      // Oyunu sıfırlama işlemi burada yapılacak
+      return state;
+    default:
+      return state;
+  }
+};
+
+export default rootReducer;
+**********************************
+// src/App.js
+import React from "react";
+import { Provider } from "react-redux";
+import { createStore } from "redux";
+import rootReducer from "./reducers";
+import Board from "./components/Board";
+import "./App.css";
+
+const store = createStore(rootReducer);
+
+function App() {
+  return (
+    <Provider store={store}>
+      <div className="App">
+        <h1>Hafıza Oyunu</h1>
+        <Board />
+      </div>
+    </Provider>
+  );
+}
+
+export default App;
+****************************
