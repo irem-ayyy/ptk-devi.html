@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerçek Zamanlı Etkinlik Listesi</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+      /* Genel sayfa stilleri */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        h1 {
+            text-align: center;
+        }
+        
+        h2 {
+            margin-top: 20px;
+        }
+        
+        /* Etkinlik listesi stilleri */
+        #event-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        #event-list li {
+            background-color: #f0f0f0;
+            padding: 10px;
+            cursor: pointer;
+        }
+        
+        #event-list li:hover {
+            background-color: #e0e0e0;
+        }
+        
+        /* Etkinlik detayı stilleri */
+        #event-detail {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        
+        #event-detail h3 {
+            margin-top: 0;
+        }
+        
+        #event-detail ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        #event-detail ul li {
+            margin-left: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Etkinlik Listesi</h1>
+    <ul id="event-list">
+        <!-- Etkinlikler burada dinamik olarak oluşturulacak -->
+    </ul>
+    <h2>Etkinlik Detayı</h2>
+    <div id="event-detail">
+        <!-- Etkinlik detayı burada dinamik olarak oluşturulacak -->
+    </div>
+    <script>
+      // Etkinlik verilerini tutacak bir dizi oluşturun
+      const events = [];
+      
+      // HTML elementlerini seçin
+      const eventList = document.getElementById("event-list");
+      const eventDetail = document.getElementById("event-detail");
+      
+      // Etkinlikleri listelemek için bir fonksiyon oluşturun
+      function displayEvents() {
+          eventList.innerHTML = ""; // Etkinlik listesini temizle
+      
+          // Her etkinliği dolaşarak listeye ekleyin
+          events.forEach((event, index) => {
+              const li = document.createElement("li");
+              li.textContent = event.name;
+      
+              // Etkinliğe tıklanırsa detaylarını göster
+              li.addEventListener("click", () => {
+                  displayEventDetail(index);
+              });
+      
+              eventList.appendChild(li);
+          });
+      }
+      
+      // Etkinlik detayını göstermek için bir fonksiyon oluşturun
+      function displayEventDetail(index) {
+          const event = events[index];
+          eventDetail.innerHTML = ""; // Etkinlik detayını temizle
+      
+          const h3 = document.createElement("h3");
+          h3.textContent = event.name;
+          eventDetail.appendChild(h3);
+      
+          const ul = document.createElement("ul");
+          event.participants.forEach((participant) => {
+              const li = document.createElement("li");
+              li.textContent = participant;
+              ul.appendChild(li);
+          });
+          eventDetail.appendChild(ul);
+      }
+      
+      // Yeni bir etkinlik eklemek için bir fonksiyon oluşturun
+      function addEvent(name) {
+          const event = {
+              name,
+              participants: [],
+          };
+          events.push(event);
+          displayEvents();
+      }
+      
+      // Yeni bir katılımcı eklemek için bir fonksiyon oluşturun
+      function addParticipant(index, participant) {
+          events[index].participants.push(participant);
+          displayEventDetail(index);
+      }
+      
+      // Örnek etkinlikler ekleyin (isteğe bağlı)
+      addEvent("Etkinlik 1");
+      addEvent("Etkinlik 2");
+      
+      // Örnek katılımcılar ekleyin (isteğe bağlı)
+      addParticipant(0, "Katılımcı 1");
+      addParticipant(0, "Katılımcı 2");
+      
+      // Etkinlikleri başlangıçta gösterin
+      displayEvents();
+
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
