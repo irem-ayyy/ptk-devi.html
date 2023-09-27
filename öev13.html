@@ -1,0 +1,125 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import App from './App';
+
+const client = new ApolloClient({
+  uri: 'http://localhost:4000/graphql', // GraphQL sunucunuzun URL'sini buraya ekleyin
+  cache: new InMemoryCache(),
+});
+
+ReactDOM.render(
+  <ApolloProvider client={client}>
+    <App />
+  </ApolloProvider>,
+  document.getElementById('root')
+);
+***************************
+import React from 'react';
+import { useQuery } from '@apollo/client';
+import { gql } from 'graphql-tag';
+
+const GET_EVENTS = gql`
+  query {
+    events {
+      id
+      title
+      description
+      time
+    }
+  }
+`;
+
+function EventList() {
+  const { loading, error, data } = useQuery(GET_EVENTS);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  return (
+    <div>
+      <h2>Event List</h2>
+      <ul>
+        {data.events.map((event) => (
+          <li key={event.id}>{event.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default EventList;
+**************************
+import React from 'react';
+import { useQuery } from '@apollo/client';
+import { gql } from 'graphql-tag';
+
+const GET_EVENT = gql`
+  query GetEvent($id: Int!) {
+    event(id: $id) {
+      title
+      description
+      time
+      user {
+        id
+        username
+      }
+      location {
+        id
+        name
+      }
+      pariticipants {
+        id
+        username
+      }
+    }
+  }
+`;
+
+function EventDetail({ eventId }) {
+  const { loading, error, data } = useQuery(GET_EVENT, {
+    variables: { id: eventId },
+  });
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  const event = data.event;
+
+  return (
+    <div>
+      <h2>Event Detail</h2>
+      <h3>Title: {event.title}</h3>
+      <p>Description: {event.description}</p>
+      <p>Time: {event.time}</p>
+      <p>Owner: {event.user.username}</p>
+      <p>Location: {event.location.name}</p>
+      <p>Participants:</p>
+      <ul>
+        {event.pariticipants.map((participant) => (
+          <li key={participant.id}>{participant.username}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default EventDetail;
+****************
+import React, { useState } from 'react';
+import EventList from './components/EventList';
+import EventDetail from './components/EventDetail';
+
+function App() {
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  return (
+    <div>
+      <h1>Event App</h1>
+      <EventList />
+      {selectedEvent && <EventDetail eventId={selectedEvent} />}
+    </div>
+  );
+}
+
+export default App;
