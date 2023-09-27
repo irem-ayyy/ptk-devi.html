@@ -1,0 +1,105 @@
+import React, { useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { gql } from 'apollo-boost';
+
+const ADD_EVENT = gql`
+  mutation AddEvent($title: String!, $description: String!, $location: String!, $date: String!, $time: String!) {
+    addEvent(title: $title, description: $description, location: $location, date: $date, time: $time) {
+      id
+      title
+      description
+      location
+      date
+      time
+    }
+  }
+`;
+
+const EventForm = () => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [location, setLocation] = useState('');
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const [addEvent] = useMutation(ADD_EVENT);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await addEvent({
+        variables: {
+          title,
+          description,
+          location,
+          date,
+          time,
+        },
+      });
+
+      // Etkinlik eklenince inputları temizle
+      setTitle('');
+      setDescription('');
+      setLocation('');
+      setDate('');
+      setTime('');
+    } catch (error) {
+      console.error('Etkinlik eklenirken bir hata oluştu:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Yeni Etkinlik Ekle</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Başlık:</label>
+          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+        </div>
+        <div>
+          <label>Açıklama:</label>
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} required />
+        </div>
+        <div>
+          <label>Konum:</label>
+          <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} required />
+        </div>
+        <div>
+          <label>Tarih:</label>
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+        </div>
+        <div>
+          <label>Saat:</label>
+          <input type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
+        </div>
+        <div>
+          <button type="submit" disabled={loading}>
+            {loading ? 'Etkinlik Ekleniyor...' : 'Etkinlik Ekle'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default EventForm;
+******************
+import React from 'react';
+import EventForm from './EventForm';
+
+const App = () => {
+  return (
+    <div>
+      <h1>React GraphQL Etkinlik Takvimi</h1>
+      <EventForm />
+      {/* Diğer bileşenleri buraya ekleyebilirsiniz */}
+    </div>
+  );
+};
+
+export default App;
