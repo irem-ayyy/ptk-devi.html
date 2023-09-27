@@ -1,0 +1,151 @@
+const express = require('express');
+const { graphqlHTTP } = require('express-graphql');
+const { GraphQLSchema, GraphQLObjectType, GraphQLList, GraphQLInt, GraphQLString, GraphQLNonNull, GraphQLID } = require('graphql');
+const { GraphQLServer } = require('graphql-yoga');
+const { PubSub } = require('graphql-subscriptions');
+
+const pubsub = new PubSub();
+
+// Örnek veri seti
+let users = [
+  { id: '1', username: 'user1' },
+  { id: '2', username: 'user2' },
+];
+
+let locations = [
+  { id: '1', name: 'location1' },
+  { id: '2', name: 'location2' },
+];
+
+let events = [
+  { id: '1', title: 'event1', userId: '1', locationId: '1' },
+  { id: '2', title: 'event2', userId: '2', locationId: '2' },
+];
+
+let participants = [
+  { id: '1', username: 'participant1', eventId: '1' },
+  { id: '2', username: 'participant2', eventId: '1' },
+  { id: '3', username: 'participant3', eventId: '2' },
+];
+
+const UserType = new GraphQLObjectType({
+  name: 'User',
+  fields: {
+    id: { type: GraphQLID },
+    username: { type: GraphQLString },
+  },
+});
+
+const LocationType = new GraphQLObjectType({
+  name: 'Location',
+  fields: {
+    id: { type: GraphQLID },
+    name: { type: GraphQLString },
+  },
+});
+
+const EventType = new GraphQLObjectType({
+  name: 'Event',
+  fields: {
+    id: { type: GraphQLID },
+    title: { type: GraphQLString },
+    user: {
+      type: UserType,
+      resolve: (event) => users.find((user) => user.id === event.userId),
+    },
+    location: {
+      type: LocationType,
+      resolve: (event) => locations.find((location) => location.id === event.locationId),
+    },
+  },
+});
+
+const ParticipantType = new GraphQLObjectType({
+  name: 'Participant',
+  fields: {
+    id: { type: GraphQLID },
+    username: { type: GraphQLString },
+  },
+});
+
+const RootQueryType = new GraphQLObjectType({
+  name: 'Query',
+  fields: {
+    // ... (Önceki kodlar buraya eklenir)
+  },
+});
+
+const MutationType = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    // ... (Önceki kodlar buraya eklenir)
+  },
+});
+
+const SubscriptionType = new GraphQLObjectType({
+  name: 'Subscription',
+  fields: {
+    userCreated: {
+      type: UserType,
+      subscribe: () => pubsub.asyncIterator(['USER_CREATED']),
+    },
+    eventCreated: {
+      type: EventType,
+      subscribe: () => pubsub.asyncIterator(['EVENT_CREATED']),
+    },
+    participantAdded: {
+      type: ParticipantType,
+      subscribe: () => pubsub.asyncIterator(['PARTICIPANT_ADDED']),
+    },
+  },
+});
+
+const schema = new GraphQLSchema({
+  query: RootQueryType,
+  mutation: MutationType,
+  subscription: SubscriptionType, // Subscription'ları ekleyin
+});
+
+const app = express();
+
+app.use(
+  '/graphql',
+  graphqlHTTP({
+    schema,
+    graphiql: true,
+  })
+);
+
+const server = new GraphQLServer({
+  schema,
+  context: ({ request }) => ({
+    request,
+    pubsub,
+  }),
+});
+
+server.start(() => {
+  console.log('Server is running on http://localhost:4000');
+});
+
+// Kullanıcı ekleme, event ekleme ve participant ekleme işlemleri için örnek kodlar
+let userIdCounter = 3;
+let eventIdCounter = 3;
+let participantIdCounter = 3;
+
+setInterval(() => {
+  // Örnek bir kullanıcı ekleme işlemi
+  const newUser = { id: String(++userIdCounter), username: `user${userIdCounter}` };
+  users.push(newUser);
+  pubsub.publish('USER_CREATED', { userCreated: newUser });
+
+  // Örnek bir event ekleme işlemi
+  const newEvent = { id: String(++eventIdCounter), title: `event${eventIdCounter}`, userId: String(userIdCounter), locationId: String(userIdCounter) };
+  events.push(newEvent);
+  pubsub.publish('EVENT_CREATED', { eventCreated: newEvent });
+
+  // Örnek bir participant ekleme işlemi
+  const newParticipant = { id: String(++participantIdCounter), username: `participant${participantIdCounter}`, eventId: String(eventIdCounter) };
+  participants.push(newParticipant);
+  pubsub.publish('PARTICIPANT_ADDED', { participantAdded: newParticipant });
+}, 5000); // 5 saniyede bir yeni veri eklenir
