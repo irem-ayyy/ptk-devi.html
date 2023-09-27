@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Ön İzleyici</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #e6a101;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 20px;
+        }
+
+        .input, .output {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        h2 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Markdown Ön İzleyici</h1>
+    <div class="container">
+        <div class="input">
+            <h2>Markdown Girişi</h2>
+            <textarea id="markdownInput" placeholder="Markdown metnini buraya girin..."></textarea>
+            <button id="previewButton">Önizleme</button>
+            <button id="exampleButton">Örnek</button>
+        </div>
+        <div class="output">
+            <h2>Ön İzleme</h2>
+            <div id="markdownPreview"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        const markdownInput = document.getElementById('markdownInput');
+        const markdownPreview = document.getElementById('markdownPreview');
+        const previewButton = document.getElementById('previewButton');
+        const exampleButton = document.getElementById('exampleButton');
+
+        previewButton.addEventListener('click', updatePreview);
+        exampleButton.addEventListener('click', showExample);
+
+        function updatePreview() {
+            const markdownText = markdownInput.value;
+            const htmlText = marked(markdownText);
+            markdownPreview.innerHTML = htmlText;
+        }
+
+        function showExample() {
+            const exampleMarkdown = `# Başlık
+
+            Bu bir **markdown** örneğidir. [Markdown](https://www.markdownguide.org/) kullanarak metin biçimlendirmek çok kolaydır.
+
+            - Listeler
+            - **Kalın** ve *italik* metinler
+            - [Bağlantılar](https://www.example.com/)
+            - \`Kod parçacıkları\`
+
+            > Alıntılar da ekleyebilirsiniz.
+
+            \`\`\`
+            function sayHello() {
+                console.log("Merhaba, dünya!");
+            }
+            \`\`\`
+
+            Bu sadece bir örnek metindir.
+            `;
+
+            markdownInput.value = exampleMarkdown;
+            updatePreview();
+        }
+    });
+
+    </script>
+    <script src="markdown-it.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
