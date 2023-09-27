@@ -1,0 +1,59 @@
+import React from 'react';
+import { connect } from 'react-redux';
+import { movePiece, restartGame } from '../redux/actions';
+
+const Board = ({ board, movePiece, restartGame }) => {
+  // Tahta ve taşları göstermek için JSX kodları burada olacak
+  return (
+    <div className="board">
+      {/* Tahta ve taşları burada göster */}
+      <button onClick={restartGame}>Yeniden Başlat</button>
+    </div>
+  );
+};
+
+const mapStateToProps = (state) => ({
+  board: state.board,
+});
+
+const mapDispatchToProps = {
+  movePiece,
+  restartGame,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Board);
+************************
+export const MOVE_PIECE = 'MOVE_PIECE';
+export const RESTART_GAME = 'RESTART_GAME';
+
+export const movePiece = (source, target) => ({
+  type: MOVE_PIECE,
+  payload: { source, target },
+});
+
+export const restartGame = () => ({
+  type: RESTART_GAME,
+});
+*************************
+import { combineReducers } from 'redux';
+import { MOVE_PIECE, RESTART_GAME } from './actions';
+
+// Oyun tahtasının başlangıç durumu
+const initialBoard = [
+  // Taşların başlangıç pozisyonları burada olacak
+];
+
+const boardReducer = (state = initialBoard, action) => {
+  switch (action.type) {
+    case MOVE_PIECE:
+      // Taşları hareket ettirme mantığı burada olacak
+    case RESTART_GAME:
+      return initialBoard;
+    default:
+      return state;
+  }
+};
+
+export default combineReducers({
+  board: boardReducer,
+});
