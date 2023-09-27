@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Türkiye Hava Durumu</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #ed8c03;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .location {
+            margin: 20px;
+        }
+
+        .location label, #citySelect, #getWeatherButton {
+            margin: 5px;
+        }
+
+        .weather-card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            display: inline-block;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .weather-card img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .weather-cards {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Türkiye Hava Durumu</h1>
+    <div class="location">
+        <label for="citySelect">Şehir Seçin:</label>
+        <select id="citySelect">
+            <option value="istanbul">İstanbul</option>
+            <option value="ankara">Ankara</option>
+            <option value="izmir">İzmir</option>
+            <!-- Diğer şehirler burada listelenebilir -->
+        </select>
+        <button id="getWeatherButton">Hava Durumu Getir</button>
+    </div>
+    <div class="weather-cards">
+        <!-- Hava durumu kartları burada oluşturulacak -->
+        <div class="weather-card">
+            <h2>Pazartesi</h2>
+            <img src="icon-url-1.png" alt="Hava Durumu">
+            <p>Sıcaklık: 25°C</p>
+        </div>
+        <div class="weather-card">
+            <h2>Salı</h2>
+            <img src="icon-url-2.png" alt="Hava Durumu">
+            <p>Sıcaklık: 28°C</p>
+        </div>
+        <div class="weather-card">
+            <h2>Çarşamba</h2>
+            <img src="icon-url-2.png" alt="Hava Durumu">
+            <p>Sıcaklık: 29°C</p>
+        </div>
+        <div class="weather-card">
+            <h2>Perşembe</h2>
+            <img src="icon-url-2.png" alt="Hava Durumu">
+            <p>Sıcaklık: 30°C</p>
+        </div>
+        <div class="weather-card">
+            <h2>Cuma</h2>
+            <img src="icon-url-2.png" alt="Hava Durumu">
+            <p>Sıcaklık: 32°C</p>
+        </div>
+        <div class="weather-card">
+            <h2>Cumartesi</h2>
+            <img src="icon-url-2.png" alt="Hava Durumu">
+            <p>Sıcaklık: 34°C</p>
+        </div>
+        <div class="weather-card">
+            <h2>Pazar</h2>
+            <img src="icon-url-2.png" alt="Hava Durumu">
+            <p>Sıcaklık: 40°C</p>
+        </div>
+        <!-- Diğer günler için benzer hava durumu kartları eklenebilir -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const citySelect = document.getElementById('citySelect');
+            const getWeatherButton = document.getElementById('getWeatherButton');
+            const weatherCards = document.querySelector('.weather-cards');
+            const apiKey = 'YOUR_OPENWEATHER_API_KEY'; // OpenWeather API anahtarınızı buraya ekleyin
+
+            getWeatherButton.addEventListener('click', function () {
+                const selectedCity = citySelect.value;
+                fetchWeather(selectedCity);
+            });
+
+            function fetchWeather(city) {
+                // OpenWeather API'den hava durumu verilerini çekme
+                fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displayWeatherData(data);
+                    })
+                    .catch(error => {
+                        console.error('Hava durumu verileri çekilirken bir hata oluştu:', error);
+                    });
+            }
+
+            function displayWeatherData(data) {
+                // Hava durumu kartlarını oluşturup görüntüleme işlemi
+                weatherCards.innerHTML = '';
+
+                for (let i = 0; i < data.list.length; i += 8) { // Her gün için bir hava durumu verisi alınır
+                    const dayData = data.list[i];
+                    const date = new Date(dayData.dt * 1000); // Unix zamanını JavaScript tarihine çevirme
+                    const day = date.toLocaleDateString('tr-TR', { weekday: 'long' });
+                    const iconUrl = `https://openweathermap.org/img/wn/${dayData.weather[0].icon}.png`;
+                    const temperature = dayData.main.temp;
+
+                    createWeatherCard(day, iconUrl, temperature);
+                }
+            }
+
+            function createWeatherCard(day, iconUrl, temperature) {
+                const card = document.createElement('div');
+                card.classList.add('weather-cards');
+                card.innerHTML = `
+                    <h2>${day}</h2>
+                    <img src="${iconUrl}" alt="Hava Durumu">
+                    <p>Sıcaklık: ${temperature}°C</p>
+                `;
+                weatherCards.appendChild(card);
+            }
+        });
+
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
