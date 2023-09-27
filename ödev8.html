@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klavye Hız Testi</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .game {
+            margin: 20px 0;
+        }
+
+        .word-container {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results h2 {
+            margin-top: 20px;
+            color: #333;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Klavye Hız Testi</h1>
+        <div class="game">
+            <div class="word-container">
+                <span id="word"></span>
+            </div>
+            <input type="text" id="userInput" placeholder="Kelimeyi yazın...">
+            <button id="startButton">Başla</button>
+            <button id="restartButton">Yeniden Başla</button>
+        </div>
+        <div class="results">
+            <h2>Sonuçlar</h2>
+            <p>Süre: <span id="timer">60</span> saniye</p>
+            <p>Doğru: <span id="correctCount">0</span></p>
+            <p>Yanlış: <span id="wrongCount">0</span></p>
+            <p>Hız: <span id="speed">0</span> kelime/dakika</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const wordContainer = document.getElementById('word');
+            const userInput = document.getElementById('userInput');
+            const startButton = document.getElementById('startButton');
+            const restartButton = document.getElementById('restartButton');
+            const timerDisplay = document.getElementById('timer');
+            const correctCountDisplay = document.getElementById('correctCount');
+            const wrongCountDisplay = document.getElementById('wrongCount');
+            const speedDisplay = document.getElementById('speed');
+            let timer;
+            let wordList;
+            let currentWordIndex = 0;
+            let correctCount = 0;
+            let wrongCount = 0;
+            let startTime;
+            let endTime;
+
+            startButton.addEventListener('click', startGame);
+            restartButton.addEventListener('click', restartGame);
+
+            function startGame() {
+                startButton.disabled = true;
+                userInput.disabled = false;
+                userInput.focus();
+                wordList = generateWords();
+                currentWordIndex = 0;
+                correctCount = 0;
+                wrongCount = 0;
+                startTime = new Date().getTime();
+                updateWord();
+                startTimer();
+            }
+
+            function restartGame() {
+                clearInterval(timer);
+                userInput.value = '';
+                userInput.disabled = true;
+                startButton.disabled = false;
+                wordContainer.textContent = '';
+                timerDisplay.textContent = '60';
+                correctCountDisplay.textContent = '0';
+                wrongCountDisplay.textContent = '0';
+                speedDisplay.textContent = '0';
+                results.style.display = 'none';
+            }
+
+            function generateWords() {
+                // Burada rastgele kelimeleri üretebilirsiniz.
+                // Örnek bir kelime listesi:
+                return ['apple', 'banana', 'cherry', 'date', 'elderberry'];
+            }
+
+            function updateWord() {
+                if (currentWordIndex < wordList.length) {
+                    wordContainer.textContent = wordList[currentWordIndex];
+                } else {
+                    endGame();
+                }
+            }
+
+            function startTimer() {
+                timer = setInterval(function () {
+                    const currentTime = new Date().getTime();
+                    const elapsedTime = Math.floor((currentTime - startTime) / 1000);
+                    const remainingTime = 60 - elapsedTime;
+
+                    if (remainingTime > 0) {
+                        timerDisplay.textContent = remainingTime;
+                    } else {
+                        endGame();
+                    }
+                }, 1000);
+            }
+
+            function endGame() {
+                clearInterval(timer);
+                userInput.disabled = true;
+                calculateSpeed();
+                results.style  = 'block';
+    }
+
+    function calculateSpeed() {
+        endTime = new Date().getTime();
+        const elapsedTime = (endTime - startTime) / 60000; // Dakika cinsinden süre
+        const wordsTyped = currentWordIndex;
+        const speed = Math.floor(wordsTyped / elapsedTime);
+        speedDisplay.textContent = speed;
+    }
+
+    userInput.addEventListener('input', function () {
+        const userInputText = userInput.value.trim().toLowerCase();
+        const currentWord = wordList[currentWordIndex].toLowerCase();
+
+        if (userInputText === currentWord) {
+            wordContainer.style.color = 'green';
+            currentWordIndex++;
+            correctCount++;
+            correctCountDisplay.textContent = correctCount;
+            userInput.value = '';
+            updateWord();
+        } else {
+            wordContainer.style.color = 'red';
+            wrongCount++;
+            wrongCountDisplay.textContent = wrongCount;
+        }
+    });
+});
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
