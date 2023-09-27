@@ -1,0 +1,158 @@
+const express = require('express');
+const { ApolloServer, PubSub } = require('apollo-server-express');
+const { GraphQLObjectType, GraphQLString } = require('graphql');
+const { RedisPubSub } = require('graphql-redis-subscriptions');
+const Redis = require('ioredis');
+
+const app = express();
+
+// Redis bağlantısını yapılandırın
+const redis = new Redis();
+
+// PubSub için Redis kullanımını etkinleştirin
+const pubsub = new RedisPubSub({
+  publisher: new Redis(),
+  subscriber: new Redis(),
+});
+
+// Örnek veri seti
+const messages = [];
+
+// GraphQL şemasını oluşturun
+const MessageType = new GraphQLObjectType({
+  name: 'Message',
+  fields: {
+    text: { type: GraphQLString },
+  },
+});
+
+const { GraphQLServer } = require('graphql-yoga');
+const { PrismaClient } = require('@prisma/client')
+
+const prisma = new PrismaClient()
+
+const typeDefs = `
+  type Query {
+    messages: [Message]
+  }
+
+  type Mutation {
+    postMessage(text: String!): Boolean
+  }
+
+  type Subscription {
+    messages: [Message]
+  }
+`;
+
+const resolvers = {
+  Query: {
+    messages: () => messages,
+  },
+  Mutation: {
+    postMessage: (parent, { text }) => {
+      const message = { text };
+      messages.push(message);
+      pubsub.publish('NEW_MESSAGE', { messages });
+      return true;
+    },
+  },
+  Subscription: {
+    messages: {
+      subscribe: () => pubsub.asyncIterator('NEW_MESSAGE'),
+    },
+  },
+};
+
+const server = new ApolloServer({ typeDefs, resolvers });
+server.applyMiddleware({ app });
+
+const httpServer = require('http').createServer(app);
+server.installSubscriptionHandlers(httpServer);
+
+httpServer.listen(4000, () => {
+  console.log('Server is running on http://localhost:4000');
+});
+*************************
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, split } from '@apollo/client';
+import { WebSocketLink } from '@apollo/client/link/ws';
+import { getMainDefinition } from '@apollo/client/utilities';
+import { ApolloProvider as ApolloHooksProvider } from 'react-apollo-hooks';
+import { ApolloProvider as ApolloHooksProvider2 } from '@apollo/react-hooks';
+import { setContext } from 'apollo-link-context';
+import { gql } from 'apollo-boost';
+import { useSubscription } from '@apollo/react-hooks';
+
+import './index.css';
+import App from './App';
+import * as serviceWorker from './serviceWorker';
+
+const httpLink = createHttpLink({
+  uri: 'http://localhost:4000/graphql',
+});
+
+const authLink = setContext((_, { headers }) => {
+  // Burada gerektiğinde kimlik doğrulama başlığını ekleyebilirsiniz.
+  return {
+    headers: {
+      ...headers,
+    },
+  };
+});
+
+const wsLink = new WebSocketLink({
+  uri: `ws://localhost:4000/graphql`,
+  options: {
+    reconnect: true,
+  },
+});
+
+const link = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
+  },
+  wsLink,
+  authLink.concat(httpLink)
+);
+
+const client = new ApolloClient({
+  link,
+  cache: new InMemoryCache(),
+});
+
+const MessageSubscription = gql`
+  subscription {
+    messages {
+      text
+    }
+  }
+`;
+
+function Message() {
+  const { data } = useSubscription(MessageSubscription);
+
+  return (
+    <div>
+      {data && data.messages && data.messages.map((message, index) => (
+        <p key={index}>{message.text}</p>
+      ))}
+    </div>
+  );
+}
+
+ReactDOM.render(
+  <ApolloProvider client={client}>
+    <ApolloHooksProvider client={client}>
+      <ApolloHooksProvider2 client={client}>
+        <App />
+        <Message />
+      </ApolloHooksProvider2>
+    </ApolloHooksProvider>
+  </ApolloProvider>,
+  document.getElementById('root')
+);
+
+serviceWorker.unregister();
