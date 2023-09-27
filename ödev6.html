@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Covid-19 Takip</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f1950c;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px;
+        }
+
+        .card {
+            flex: 1;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .country-dropdown {
+            margin: 20px;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Covid-19 Takip Uygulaması</h1>
+    <div class="stats">
+        <div class="card">
+            <h2>Enfekte</h2>
+            <p id="infectedCount">-</p>
+            <p>Son Güncelleme: <span id="infectedDate">-</span></p>
+        </div>
+        <div class="card">
+            <h2>İyileşen</h2>
+            <p id="recoveredCount">-</p>
+            <p>Son Güncelleme: <span id="recoveredDate">-</span></p>
+        </div>
+        <div class="card">
+            <h2>Ölen</h2>
+            <p id="deceasedCount">-</p>
+            <p>Son Güncelleme: <span id="deceasedDate">-</span></p>
+        </div>
+        <div class="card">
+            <h2>Aktif Hasta</h2>
+            <p id="activeCount">-</p>
+            <p>Son Güncelleme: <span id="activeDate">-</span></p>
+        </div>
+    </div>
+    <div class="country-dropdown">
+        <label for="countrySelect">Ülke Seçin:</label>
+        <select id="countrySelect">
+            <option value="all">Tüm Dünya</option>
+            <option value="all">Türkiye</option>
+            <!-- Diğer ülkeler burada listelenebilir -->
+        </select>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart"></canvas>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        const infectedCount = document.getElementById('infectedCount');
+        const infectedDate = document.getElementById('infectedDate');
+        const recoveredCount = document.getElementById('recoveredCount');
+        const recoveredDate = document.getElementById('recoveredDate');
+        const deceasedCount = document.getElementById('deceasedCount');
+        const deceasedDate = document.getElementById('deceasedDate');
+        const activeCount = document.getElementById('activeCount');
+        const activeDate = document.getElementById('activeDate');
+        const countrySelect = document.getElementById('countrySelect');
+        const chart = document.getElementById('chart').getContext('2d');
+
+        // API ile veri çekme işlemleri burada yapılmalıdır.
+        // Örnek bir API kullanımı:
+        // fetch('API_URL')
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         // Verileri kartlara ve grafiklere yerleştirme işlemleri burada yapılabilir.
+        //     })
+        //     .catch(error => console.error(error));
+
+        // Örnek verileri kartlara yerleştirme
+        infectedCount.textContent = "100,000";
+        infectedDate.textContent = "2023-09-27";
+        recoveredCount.textContent = "90,000";
+        recoveredDate.textContent = "2023-09-27";
+        deceasedCount.textContent = "2,000";
+        deceasedDate.textContent = "2023-09-27";
+        activeCount.textContent = "8,000";
+        activeDate.textContent = "2023-09-27";
+
+        // Örnek verileri grafik oluşturma
+        const chartData = {
+            labels: ["Infected", "Recovered", "Deceased", "Active"],
+            datasets: [{
+                label: "COVID-19 Statistics",
+                backgroundColor: ["#FF5733", "#36A2EB", "#FFCE56", "#4BC0C0"],
+                data: [100000, 90000, 2000, 8000]
+            }]
+        };
+
+        new Chart(chart, {
+            type: 'bar',
+            data: chartData
+        });
+    });
+
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
