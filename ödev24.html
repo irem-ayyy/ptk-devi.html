@@ -1,0 +1,90 @@
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import BMICalculator from './BMICalculator';
+import DietPlan from './DietPlan';
+
+function App() {
+  return (
+    <Router>
+      <div className="App">
+        <Switch>
+          <Route exact path="/" component={BMICalculator} />
+          <Route path="/diet-plan" component={DietPlan} />
+        </Switch>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+**************************
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+
+const Container = styled.div`
+  /* Stillemeleri burada yapabilirsiniz */
+`;
+
+const BMICalculator = () => {
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
+  const [bmi, setBMI] = useState(null);
+
+  useEffect(() => {
+    // BMI hesaplama işlemleri burada yapılabilir
+  }, [height, weight]);
+
+  const calculateBMI = () => {
+    // BMI hesaplama işlemleri burada yapılabilir
+  };
+
+  return (
+    <Container>
+      <h2>BMI Hesaplayıcı</h2>
+      <form>
+        <label>Boy (cm): </label>
+        <input
+          type="number"
+          value={height}
+          onChange={(e) => setHeight(e.target.value)}
+        />
+        <br />
+        <label>Kilo (kg): </label>
+        <input
+          type="number"
+          value={weight}
+          onChange={(e) => setWeight(e.target.value)}
+        />
+        <br />
+        <button onClick={calculateBMI}>Hesapla</button>
+      </form>
+      {bmi && <p>BMI: {bmi}</p>}
+      <button onClick={() => window.location.replace('/diet-plan')}>
+        Diyet Planı Görüntüle
+      </button>
+    </Container>
+  );
+};
+
+export default BMICalculator;
+*******************
+import React from 'react';
+import styled from 'styled-components';
+
+const Container = styled.div`
+  /* Stillemeleri burada yapabilirsiniz */
+`;
+
+const DietPlan = () => {
+  // Diyet planı verileri burada tanımlanabilir
+
+  return (
+    <Container>
+      <h2>Diyet Planı</h2>
+      {/* Diyet planını burada görüntüleyebilirsiniz */}
+      <button onClick={() => window.location.replace('/')}>Geri Dön</button>
+    </Container>
+  );
+};
+
+export default DietPlan;
