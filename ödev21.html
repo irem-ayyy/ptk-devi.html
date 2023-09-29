@@ -1,0 +1,89 @@
+// WeatherContext.js
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import axios from 'axios';
+
+const WeatherContext = createContext();
+
+export const useWeather = () => {
+  return useContext(WeatherContext);
+};
+
+export const WeatherProvider = ({ children }) => {
+  const [weatherData, setWeatherData] = useState(null);
+  const [selectedCity, setSelectedCity] = useState('Istanbul'); // Varsayılan şehir
+
+  useEffect(() => {
+    const fetchWeatherData = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.openweathermap.org/data/2.5/forecast?q=${selectedCity}&units=metric&appid=YOUR_API_KEY`
+        );
+        setWeatherData(response.data);
+      } catch (error) {
+        console.error('Hava durumu verileri alınamadı', error);
+      }
+    };
+
+    fetchWeatherData();
+  }, [selectedCity]);
+
+  const values = {
+    weatherData,
+    selectedCity,
+    setSelectedCity,
+  };
+
+  return (
+    <WeatherContext.Provider value={values}>
+      {children}
+    </WeatherContext.Provider>
+  );
+};
+****************
+// App.js
+import React from 'react';
+import { WeatherProvider } from './WeatherContext';
+import WeatherDisplay from './WeatherDisplay';
+
+function App() {
+  return (
+    <WeatherProvider>
+      <div className="App">
+        <WeatherDisplay />
+      </div>
+    </WeatherProvider>
+  );
+}
+
+export default App;
+*******************
+// WeatherDisplay.js
+import React from 'react';
+import { useWeather } from './WeatherContext';
+
+const WeatherDisplay = () => {
+  const { weatherData, selectedCity, setSelectedCity } = useWeather();
+
+  return (
+    <div>
+      <h1>Hava Durumu Uygulaması</h1>
+      <div>
+        <select
+          value={selectedCity}
+          onChange={(e) => setSelectedCity(e.target.value)}
+        >
+          <option value="Istanbul">İstanbul</option>
+          <option value="Ankara">Ankara</option>
+          {/* Diğer şehirleri burada listele */}
+        </select>
+      </div>
+      {weatherData && (
+        <div>
+          {/* Hava durumu verilerini burada göster */}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default WeatherDisplay;
