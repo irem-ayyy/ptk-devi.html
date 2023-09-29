@@ -1,0 +1,41 @@
+import React from 'react';
+import { render, fireEvent } from '@testing-library/react';
+import EmojiApp from './EmojiApp';
+
+test('Başlık doğru şekilde render ediliyor mu?', () => {
+  const { getByText } = render(<EmojiApp />);
+  const titleElement = getByText(/Emoji Arama Uygulaması/i);
+  expect(titleElement).toBeInTheDocument();
+});
+
+test('Emoji listesi ilk açıldığında doğru şekilde render ediliyor mu?', () => {
+  const { getByTestId } = render(<EmojiApp />);
+  const emojiList = getByTestId('emoji-list');
+  expect(emojiList).toBeInTheDocument();
+});
+
+test('Filtreleme işlemi sonucu emoji listesi doğru şekilde yeniden render ediliyor mu?', () => {
+  const { getByTestId, getByPlaceholderText } = render(<EmojiApp />);
+  const inputElement = getByPlaceholderText('Emoji ara...');
+  const emojiList = getByTestId('emoji-list');
+
+  // Input alanına "heart" yazılıyor ve değişikliğin tetiklenmesi bekleniyor.
+  fireEvent.change(inputElement, { target: { value: 'heart' } });
+
+  // Filtrelenmiş emoji listesi kontrol ediliyor.
+  expect(emojiList).toBeInTheDocument();
+  expect(emojiList.children.length).toBeGreaterThan(0); // Filtre sonucunda emoji listesinde en az bir öğe olmalıdır.
+});
+
+test('Emojiye tıklandığında ilgili emojinin kopyalandığı doğru şekilde kontrol ediliyor mu?', () => {
+  const { getByTestId, getByText } = render(<EmojiApp />);
+  const emojiList = getByTestId('emoji-list');
+
+  // İlk emoji öğesine tıklanıyor.
+  const firstEmoji = emojiList.firstChild;
+  fireEvent.click(firstEmoji);
+
+  // Kopyalanmış metni içeren bir mesajın render edildiği kontrol ediliyor.
+  const copiedMessage = getByText(/Kopyalandı/i);
+  expect(copiedMessage).toBeInTheDocument();
+});
