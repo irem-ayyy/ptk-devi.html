@@ -1,0 +1,93 @@
+import React from 'react';
+import './MyButton.css'; // Stil dosyası
+
+function MyButton({ type = 'default', children, ...rest }) {
+  // type prop'u ile farklı stillendirmeleri uygula
+  const className = `my-button ${type}`;
+
+  return (
+    <button className={className} {...rest}>
+      {children}
+    </button>
+  );
+}
+
+export default MyButton;
+*****************
+.my-button {
+  /* Varsayılan stiller */
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.my-button.primary {
+  background-color: #007bff;
+}
+
+.my-button.default {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+.my-button.dashed {
+  background-color: transparent;
+  border: 1px dashed #007bff;
+}
+
+.my-button.text {
+  background-color: transparent;
+  color: #007bff;
+}
+
+.my-button.link {
+  background-color: transparent;
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.my-button:hover {
+  /* Hover durumunda stiller */
+  background-color: #0056b3;
+}
+**************
+{
+  "name": "my-button-component",
+  "version": "1.0.0",
+  "description": "My custom button component",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "react-scripts build",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/my-button-component.git"
+  },
+  "keywords": ["react", "button"],
+  "author": "Your Name",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
+  }
+}
+***************
+import React from 'react';
+import MyButton from 'my-button-component';
+
+function App() {
+  return (
+    <div>
+      <MyButton type="primary">Primary Button</MyButton>
+      <MyButton type="default">Default Button</MyButton>
+      <MyButton type="dashed">Dashed Button</MyButton>
+      <MyButton type="text">Text Button</MyButton>
+      <MyButton type="link">Link Button</MyButton>
+    </div>
+  );
+}
+
+export default App;
