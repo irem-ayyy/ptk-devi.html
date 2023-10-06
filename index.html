@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hava Durumu Uygulaması</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Hava Durumu Uygulaması</h1>
+        <label for="city">Şehir: </label>
+        <input type="text" id="city" placeholder="Şehir adını girin">
+        <button id="getWeather">Hava Durumu Göster</button>
+        <div id="weatherInfo" class="hidden">
+            <h2 id="cityName"></h2>
+            <p><strong>Sıcaklık:</strong> <span id="temperature"></span>°C</p>
+            <p><strong>Nem:</strong> <span id="humidity"></span>%</p>
+            <p><strong>Rüzgar Hızı:</strong> <span id="windSpeed"></span> m/s</p>
+            <p><strong>Hava Durumu:</strong> <span id="weatherDescription"></span></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
